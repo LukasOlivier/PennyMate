@@ -63,12 +63,21 @@
   }
 
   a {
-    color: var(--color-primary);
-    text-decoration: none;
     transition: color 0.15s ease, transform 0.12s ease;
   }
+
   a:hover {
-    color: color-mix(in srgb, var(--color-primary) 88%, black 12%);
     transform: translateY(-1px);
+  }
+
+  .links a:hover,
+  .active-link {
+    border-bottom: 1px solid white;
+  }
+
+  /* Navbar container styling: distinct but subtle background */
+  .nav-container {
+    background-color: var(--color-surface);
+    padding: 0.5rem 0.75rem;
   }
 }
