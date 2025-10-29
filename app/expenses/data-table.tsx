@@ -15,6 +15,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DataTableViewOptions } from "@/components/ui/data-table-view-options";
 import {
   Table,
   TableBody,
@@ -23,13 +24,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Plus, Trash } from "lucide-react";
+import { Pencil, Plus, Trash } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   onDeleteRows: (rowIndexes: number[]) => void;
   onAddRow: () => void;
+  onEditRow: (rowIndex: number) => void;
 }
 
 export function DataTable<TData, TValue>({
@@ -37,6 +39,7 @@ export function DataTable<TData, TValue>({
   data,
   onDeleteRows,
   onAddRow,
+  onEditRow,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -76,39 +79,53 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4 w-full justify-between flex-wrap gap-5">
-        <Input
-          placeholder="Search expenses..."
-          value={globalFilter}
-          onChange={(event) => {
-            const value = event.target.value;
-            setGlobalFilter(value);
-          }}
-          className="max-w-sm"
-        />
-        <div className="flex gap-2 grow">
+      <div className="flex py-4 w-full items-end gap-5 flex-col-reverse md:flex-row ">
+        <div className="flex gap-2 w-full">
+          <DataTableViewOptions table={table} />
+
+          <Input
+            placeholder="Search expenses..."
+            value={globalFilter}
+            onChange={(event) => {
+              const value = event.target.value;
+              setGlobalFilter(value);
+            }}
+            className="md:max-w-sm grow"
+          />
+        </div>
+        <div className="flex gap-2  ">
           <Button
-            className="bg-blue-500 cursor-pointer hover:bg-blue-600 grow"
+            className="bg-blue-500 cursor-pointer hover:bg-blue-600 "
             variant="destructive"
+            disabled={Object.keys(rowSelection).length !== 1}
+            onClick={() => {
+              onEditRow(Number(Object.keys(rowSelection)[0]));
+              table.resetRowSelection();
+            }}
+          >
+            <Pencil></Pencil>
+          </Button>
+
+          <Button
+            className="bg-red-500 cursor-pointer hover:bg-red-600 "
+            variant="destructive"
+            disabled={Object.keys(rowSelection).length === 0}
+            onClick={() => {
+              onDeleteRows(Object.keys(rowSelection).map(Number));
+              table.resetRowSelection();
+            }}
+          >
+            <Trash></Trash>
+          </Button>
+
+          <Button
+            className={"bg-blue-500 cursor-pointer hover:bg-blue-600 grow"}
+            variant="destructive"
+            disabled={Object.keys(rowSelection).length > 0}
             onClick={() => onAddRow()}
           >
             <Plus></Plus>
-            Add Expense
           </Button>
-          {(table.getIsSomePageRowsSelected() ||
-            table.getIsAllRowsSelected()) && (
-            <Button
-              className="bg-red-500 cursor-pointer hover:bg-red-600 grow"
-              variant="destructive"
-              onClick={() => {
-                onDeleteRows(Object.keys(rowSelection).map(Number));
-                table.resetRowSelection();
-              }}
-            >
-              <Trash></Trash>
-              Delete
-            </Button>
-          )}
         </div>
       </div>
       <div className="overflow-hidden rounded-md border">

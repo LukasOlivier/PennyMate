@@ -50,7 +50,7 @@ const ExpensesTable = () => {
     // Call your API endpoint here to perform the deletion
   };
 
-  const handleAddRow = async () => {
+  const handleAddRow = () => {
     const newRow: Expense = {
       id: Date.now().toString(),
       title: "",
@@ -60,6 +60,11 @@ const ExpensesTable = () => {
       paidBackOn: null,
     };
     setData((prevData) => [...prevData, newRow]);
+  };
+
+  const handleEditRow = (rowIndex: number) => {
+    // Implement your edit logic here
+    console.log("Edit row at index:", rowIndex);
   };
 
   if (loading) {
@@ -73,6 +78,7 @@ const ExpensesTable = () => {
         data={data}
         onDeleteRows={handleDeleteRows}
         onAddRow={handleAddRow}
+        onEditRow={handleEditRow}
       />
     </section>
   );
