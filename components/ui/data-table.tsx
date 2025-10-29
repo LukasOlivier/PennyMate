@@ -29,26 +29,34 @@ import { Pencil, Plus, Trash } from "lucide-react";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  onDeleteRows: (rowIndexes: number[]) => void;
-  onAddRow: () => void;
-  onEditRow: (rowIndex: number) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  onDeleteRows,
-  onAddRow,
-  onEditRow,
 }: DataTableProps<TData, TValue>) {
+  const onDeleteRows = (ids: number[]) => {
+    console.log("Delete rows with IDs:", ids);
+    // Implement deletion logic here
+  };
+
+  const onAddRow = () => {
+    console.log("Add new row");
+    // Implement add row logic here
+  };
+
+  const onEditRow = (id: number) => {
+    console.log("Edit row with ID:", id);
+    // Implement edit row logic here
+  };
+
+  // TABLE STATE
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
-
   const [rowSelection, setRowSelection] = React.useState({});
-
   const table = useReactTable({
     data,
     columns,
