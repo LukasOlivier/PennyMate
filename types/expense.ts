@@ -1,8 +1,12 @@
 export type Expense = {
-  id?: string;
+  id: string;
   title: string;
-  description?: string;
+  description: string | null;
   amount: number;
-  paidOnBehalf?: boolean; // TODO: find a better name for 'voorgeschoten'
-  paidBackOn?: Date | null;
+  paidOnBehalf: boolean;
+  paidBackOn: Date | null; // Date becomes string after serialization
+  createdAt: Date; // Date becomes string after serialization
+  updatedAt: Date; // Date becomes string after serialization
 };
+
+export type NewExpense = Omit<Expense, "id" | "createdAt" | "updatedAt">;

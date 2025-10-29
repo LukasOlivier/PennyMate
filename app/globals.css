@@ -1,20 +1,13 @@
 @import "tailwindcss";
 
-/* Design tokens + base styles */
-:root {
-  /* Colors */
-  --color-bg: #070c13; /* deep navy */
-  --color-surface: rgba(255, 255, 255, 0.04); /* subtle surface */
-  --color-card: rgba(255, 255, 255, 0.03);
-  --color-primary: #7c5cff; /* vivid violet */
-  --color-accent: #00d4ff; /* cyan accent */
-  --color-muted: rgba(255, 255, 255, 0.65);
-  --color-fg: rgba(255, 255, 255, 0.95);
+@theme {
+  --font-geist-sans: "Geist Sans", sans-serif;
+  --font-geist-mono: "Geist Mono", monospace;
 
-  /* UI */
-  --radius: 14px;
-  --glass: rgba(255, 255, 255, 0.025);
-  --focus-ring: 0 0 0 4px rgba(124, 92, 255, 0.12);
+  --color-surface: var(--color-zinc-950);
+  --color-surface-light: var(--color-zinc-900);
+  --color-surface-alt: var(--color-zinc-700);
+  --color-primary: var(--color-white);
 }
 
 /* Tailwind base overrides and typography using next/font variables */
@@ -73,9 +66,29 @@
     border-bottom: 1px solid white;
   }
 
-  /* Navbar container styling: distinct but subtle background */
-  .nav-container {
-    background-color: var(--color-surface);
-    padding: 0.5rem 0.75rem;
+  .slide-in-left-animation {
+    animation: slide-in-left 0.1s linear forwards;
+  }
+
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .slide-out-left-animation {
+    animation: slide-out-left 0.1s linear forwards;
+  }
+
+  @keyframes slide-out-left {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
   }
 }

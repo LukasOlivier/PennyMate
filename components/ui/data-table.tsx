@@ -25,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash } from "lucide-react";
-import { Expense } from "@/types/expense";
+import { Expense, NewExpense } from "@/types/expense";
 import ExpensesForm from "../expenses-form";
 import { addExpense, deleteExpenseIds } from "@/actions/actions";
 
@@ -52,7 +52,7 @@ export function DataTable<TData, TValue>({
     // setIsFormOpen(true);
 
     // TODO: replace with expense from form
-    const mockExpense: Expense = {
+    const mockExpense: NewExpense = {
       title: "New Expense",
       description: "Description",
       amount: 100,
@@ -73,7 +73,6 @@ export function DataTable<TData, TValue>({
       setEditingExpense(expense);
       setIsFormOpen(true);
     }
-    table.resetRowSelection();
   };
 
   // TABLE STATE
@@ -164,7 +163,7 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="overflow-hidden rounded-md border">
           <Table>
-            <TableHeader className="bg-gray-800">
+            <TableHeader className="bg-surface-light">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -239,7 +238,12 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       </div>
-      {isFormOpen && <ExpensesForm expense={editingExpense} />}
+      {isFormOpen && (
+        <ExpensesForm
+          expense={editingExpense}
+          onClose={() => setIsFormOpen(false)}
+        />
+      )}
     </>
   );
 }

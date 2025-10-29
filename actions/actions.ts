@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Expense } from "@/types/expense";
+import { Expense, NewExpense } from "@/types/expense";
 import { revalidatePath } from "next/cache";
 
 export async function deleteExpenseIds(expenseIds: string[]) {
@@ -16,21 +16,24 @@ export async function deleteExpenseIds(expenseIds: string[]) {
   revalidatePath("/expenses");
 }
 
-export async function addExpense(expense: Expense) {
+export async function addExpense(expense: NewExpense) {
   await prisma.expense.create({
-    data: expense,
+    data: {
+      ...expense,
+      updatedAt: new Date(),
+    },
   });
 
   revalidatePath("/expenses");
 }
 
-export async function updateExpense(expense: Expense) {
-  if (!expense.id) {
+export async function updateExpense(expense: NewExpense, id: string) {
+  if (!id) {
     throw new Error("Expense ID is required");
   }
 
   await prisma.expense.update({
-    where: { id: expense.id },
+    where: { id },
     data: expense,
   });
 

@@ -4,11 +4,9 @@ import { Expense } from "@/types/expense";
 import prisma from "@/lib/prisma";
 
 export default async function ExpensesTable() {
-  const data = (await prisma.expense.findMany()) as Expense[];
+  const expenses = (await prisma.expense.findMany({
+    orderBy: { createdAt: "desc" },
+  })) as Expense[];
 
-  return (
-    <section>
-      <DataTable columns={columns} data={data} />
-    </section>
-  );
+  return <section>{<DataTable columns={columns} data={expenses} />}</section>;
 }

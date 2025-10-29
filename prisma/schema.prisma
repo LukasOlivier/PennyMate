@@ -21,4 +21,6 @@ model Expense {
   amount       Float
   paidOnBehalf Boolean  @default(false)
   paidBackOn   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

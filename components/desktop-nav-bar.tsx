@@ -13,7 +13,7 @@ const DesktopNavbar = () => {
   ];
 
   return (
-    <div className="hidden md:block py-4 nav-container">
+    <div className="hidden md:block py-4 bg-surface-light">
       <nav className="w-full md:w-8/12 mx-auto flex justify-between items-center">
         <a className="flex gap-2 items-center hover:cursor-pointer" href="/">
           <img

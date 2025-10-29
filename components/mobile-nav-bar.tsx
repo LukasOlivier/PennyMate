@@ -19,9 +19,9 @@ const MobileNavbar = () => {
       case "Home":
         return <Home className={className} />;
       case "Income":
-        return <BanknoteArrowUp className={className} />;
-      case "Expenses":
         return <BanknoteArrowDown className={className} />;
+      case "Expenses":
+        return <BanknoteArrowUp className={className} />;
       default:
         return null;
     }
@@ -29,7 +29,7 @@ const MobileNavbar = () => {
 
   return (
     /* Mobile Sidebar */
-    <div className="md:hidden w-full nav-container">
+    <div className="md:hidden w-full bg-surface-light py-4">
       <nav className="flex justify-around items-center ">
         {links.map((link) => (
           <a

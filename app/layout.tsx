@@ -31,7 +31,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="PennyMate" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-(--color-bg) text-(--color-fg) min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-surface text-primary min-h-screen flex flex-col`}
       >
         <DeskopNavbar />
         <main className="w-11/12 md:w-8/12 mx-auto grow mt-10 md:mt-20">
