@@ -1,3 +1,4 @@
+import ExpensesForm from "@/components/expenses-form";
 import ExpensesTable from "@/components/expenses-table";
 
 export default function ExpensesPage() {

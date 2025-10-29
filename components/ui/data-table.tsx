@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -25,6 +25,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash } from "lucide-react";
+import { Expense } from "@/types/expense";
+import ExpensesForm from "../expenses-form";
+import { addExpense, deleteExpenseIds } from "@/actions/actions";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,19 +38,42 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const onDeleteRows = (ids: number[]) => {
-    console.log("Delete rows with IDs:", ids);
-    // Implement deletion logic here
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const onDeleteRows = (index: number[]) => {
+    const ids = index.map((i) => (data as Expense[])[i].id);
+    deleteExpenseIds(ids as string[]);
+    table.resetRowSelection();
   };
 
   const onAddRow = () => {
-    console.log("Add new row");
-    // Implement add row logic here
+    // setEditingExpense(null);
+    // setIsFormOpen(true);
+
+    // TODO: replace with expense from form
+    const mockExpense: Expense = {
+      title: "New Expense",
+      description: "Description",
+      amount: 100,
+      paidOnBehalf: false,
+      paidBackOn: null,
+    };
+
+    addExpense(mockExpense);
+
+    table.resetRowSelection();
   };
 
-  const onEditRow = (id: number) => {
-    console.log("Edit row with ID:", id);
-    // Implement edit row logic here
+  const handleEditRow = (index: number) => {
+    const expense = (data as Expense[]).find(
+      (exp) => exp.id === (data as Expense[])[index].id
+    ) as Expense;
+    if (expense) {
+      setEditingExpense(expense);
+      setIsFormOpen(true);
+    }
+    table.resetRowSelection();
   };
 
   // TABLE STATE
@@ -86,132 +112,134 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
-      <div className="flex py-4 w-full items-end gap-5 flex-col-reverse md:flex-row ">
-        <div className="flex gap-2 w-full">
-          <DataTableViewOptions table={table} />
+    <>
+      <div>
+        <div className="flex py-4 w-full items-end gap-5 flex-col-reverse md:flex-row ">
+          <div className="flex gap-2 w-full">
+            <DataTableViewOptions table={table} />
 
-          <Input
-            placeholder="Search expenses..."
-            value={globalFilter}
-            onChange={(event) => {
-              const value = event.target.value;
-              setGlobalFilter(value);
-            }}
-            className="md:max-w-sm grow"
-          />
+            <Input
+              placeholder="Search expenses..."
+              value={globalFilter}
+              onChange={(event) => {
+                const value = event.target.value;
+                setGlobalFilter(value);
+              }}
+              className="md:max-w-sm grow"
+            />
+          </div>
+          <div className="flex gap-2  ">
+            <Button
+              className="bg-blue-500 cursor-pointer hover:bg-blue-600 "
+              variant="destructive"
+              disabled={Object.keys(rowSelection).length !== 1}
+              onClick={() =>
+                handleEditRow(Number(Object.keys(rowSelection)[0]))
+              }
+            >
+              <Pencil></Pencil>
+            </Button>
+
+            <Button
+              className="bg-red-500 cursor-pointer hover:bg-red-600 "
+              variant="destructive"
+              disabled={Object.keys(rowSelection).length === 0}
+              onClick={() => {
+                onDeleteRows(Object.keys(rowSelection).map(Number));
+                table.resetRowSelection();
+              }}
+            >
+              <Trash></Trash>
+            </Button>
+
+            <Button
+              className={"bg-blue-500 cursor-pointer hover:bg-blue-600 grow"}
+              variant="destructive"
+              disabled={Object.keys(rowSelection).length > 0}
+              onClick={() => onAddRow()}
+            >
+              <Plus></Plus>
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2  ">
-          <Button
-            className="bg-blue-500 cursor-pointer hover:bg-blue-600 "
-            variant="destructive"
-            disabled={Object.keys(rowSelection).length !== 1}
-            onClick={() => {
-              onEditRow(Number(Object.keys(rowSelection)[0]));
-              table.resetRowSelection();
-            }}
-          >
-            <Pencil></Pencil>
-          </Button>
-
-          <Button
-            className="bg-red-500 cursor-pointer hover:bg-red-600 "
-            variant="destructive"
-            disabled={Object.keys(rowSelection).length === 0}
-            onClick={() => {
-              onDeleteRows(Object.keys(rowSelection).map(Number));
-              table.resetRowSelection();
-            }}
-          >
-            <Trash></Trash>
-          </Button>
-
-          <Button
-            className={"bg-blue-500 cursor-pointer hover:bg-blue-600 grow"}
-            variant="destructive"
-            disabled={Object.keys(rowSelection).length > 0}
-            onClick={() => onAddRow()}
-          >
-            <Plus></Plus>
-          </Button>
-        </div>
-      </div>
-      <div className="overflow-hidden rounded-md border">
-        <Table>
-          <TableHeader className="bg-gray-800">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="p-4">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="p-4">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+        <div className="overflow-hidden rounded-md border">
+          <Table>
+            <TableHeader className="bg-gray-800">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id} className="p-4">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="p-4">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
-        <div className="space-x-2">
-          <Button
-            className="cursor-pointer"
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            className="cursor-pointer"
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="text-muted-foreground flex-1 text-sm">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+          <div className="space-x-2">
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              className="cursor-pointer"
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+      {isFormOpen && <ExpensesForm expense={editingExpense} />}
+    </>
   );
 }
