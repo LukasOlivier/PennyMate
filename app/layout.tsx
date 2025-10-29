@@ -29,9 +29,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="PennyMate" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-(--color-bg) text-(--color-fg)`}
       >
-        <main>{children}</main>
+        <main className="w-full md:w-8/12 mx-auto">
+          <div>{children}</div>
+        </main>
       </body>
     </html>
   );
