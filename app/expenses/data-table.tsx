@@ -23,21 +23,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Plus, Trash } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onDeleteRows: (rowIndexes: number[]) => void;
+  onAddRow: () => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onDeleteRows,
+  onAddRow,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
+
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
@@ -58,16 +65,18 @@ export function DataTable<TData, TValue>({
     },
     onGlobalFilterChange: setGlobalFilter,
     getPaginationRowModel: getPaginationRowModel(),
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       globalFilter,
+      rowSelection,
     },
   });
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 w-full justify-between flex-wrap gap-5">
         <Input
           placeholder="Search expenses..."
           value={globalFilter}
@@ -77,6 +86,30 @@ export function DataTable<TData, TValue>({
           }}
           className="max-w-sm"
         />
+        <div className="flex gap-2 grow">
+          <Button
+            className="bg-blue-500 cursor-pointer hover:bg-blue-600 grow"
+            variant="destructive"
+            onClick={() => onAddRow()}
+          >
+            <Plus></Plus>
+            Add Expense
+          </Button>
+          {(table.getIsSomePageRowsSelected() ||
+            table.getIsAllRowsSelected()) && (
+            <Button
+              className="bg-red-500 cursor-pointer hover:bg-red-600 grow"
+              variant="destructive"
+              onClick={() => {
+                onDeleteRows(Object.keys(rowSelection).map(Number));
+                table.resetRowSelection();
+              }}
+            >
+              <Trash></Trash>
+              Delete
+            </Button>
+          )}
+        </div>
       </div>
       <div className="overflow-hidden rounded-md border">
         <Table>
@@ -135,6 +168,7 @@ export function DataTable<TData, TValue>({
         </div>
         <div className="space-x-2">
           <Button
+            className="cursor-pointer"
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
@@ -143,6 +177,7 @@ export function DataTable<TData, TValue>({
             Previous
           </Button>
           <Button
+            className="cursor-pointer"
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}

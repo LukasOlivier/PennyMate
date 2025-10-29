@@ -3,7 +3,7 @@
 /* Design tokens + base styles */
 :root {
   /* Colors */
-  --color-bg: #0f1724; /* deep navy */
+  --color-bg: #070c13; /* deep navy */
   --color-surface: rgba(255, 255, 255, 0.04); /* subtle surface */
   --color-card: rgba(255, 255, 255, 0.03);
   --color-primary: #7c5cff; /* vivid violet */
@@ -27,7 +27,6 @@
       rgba(255, 255, 255, 0.02),
       rgba(255, 255, 255, 0.015)
     );
-    color: var(--color-fg);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-family: var(--font-geist-sans), system-ui, -apple-system, "Segoe UI",
@@ -40,7 +39,6 @@
   pre {
     font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
       Monaco, "Roboto Mono", monospace;
-    color: var(--color-accent);
   }
 
   /* Headings */

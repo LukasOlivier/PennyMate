@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
+import DeskopNavbar from "@/components/DesktopNavbar";
+import MobileNavbar from "@/components/MobileNavbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,12 +31,13 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="PennyMate" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-(--color-bg) text-(--color-fg)`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-(--color-bg) text-(--color-fg) min-h-screen flex flex-col`}
       >
-        <Navbar />
-        <main className="w-full md:w-8/12 mx-auto mt-20">
+        <DeskopNavbar />
+        <main className="w-11/12 md:w-8/12 mx-auto grow mt-10 md:mt-20">
           <div>{children}</div>
         </main>
+        <MobileNavbar />
       </body>
     </html>
   );
