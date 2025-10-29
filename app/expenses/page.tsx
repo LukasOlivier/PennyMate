@@ -1,6 +1,6 @@
-import ExpensesTable from "@/components/ExpensesTable";
+import ExpensesTable from "@/components/expenses-table";
 
-export default async function ExpensesPage() {
+export default function ExpensesPage() {
   return (
     <main>
       <h1 className="text-3xl mb-2 font-bold">Expenses</h1>

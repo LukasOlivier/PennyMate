@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { columns } from "../app/expenses/columns";
-import { DataTable } from "../app/expenses/data-table";
+import { columns } from "./ui/columns";
+import { DataTable } from "./ui/data-table";
 import { Expense } from "@/types/expense";
 
 async function getData(): Promise<Expense[]> {
