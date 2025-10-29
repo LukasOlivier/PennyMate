@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Ignore shadcn/ui components to silence ESLint warnings/errors for generated UI code
+    "components/ui/**",
   ]),
 ]);
 
