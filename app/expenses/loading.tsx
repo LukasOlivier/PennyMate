@@ -1,8 +1,8 @@
-import React from "react";
+import { LoaderIcon } from "lucide-react";
 
 const Loading = () => (
   <div className="flex justify-center items-center h-40">
-    <span className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mr-2"></span>
+    <LoaderIcon className="animate-spin mr-2" />
     <span className="text-lg">Loading expenses...</span>
   </div>
 );

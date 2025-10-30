@@ -50,20 +50,8 @@ export function DataTable<TData, TValue>({
   };
 
   const onAddRow = () => {
-    // setEditingExpense(null);
-    // setIsFormOpen(true);
-
-    // TODO: replace with expense from form
-    const mockExpense: Prisma.ExpenseCreateInput = {
-      title: "New Expense",
-      description: "Description",
-      amount: 100,
-      paidOnBehalf: false,
-      paidBackOn: null,
-    };
-
-    addExpense(mockExpense);
-
+    setEditingExpense(null);
+    setIsFormOpen(true);
     table.resetRowSelection();
   };
 
@@ -75,6 +63,7 @@ export function DataTable<TData, TValue>({
       setEditingExpense(expense);
       setIsFormOpen(true);
     }
+    table.resetRowSelection();
   };
 
   // TABLE STATE

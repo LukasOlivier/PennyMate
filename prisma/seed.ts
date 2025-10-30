@@ -17,8 +17,6 @@ const mockExpenses: Prisma.ExpenseCreateInput[] = [
     amount: 120.5,
     paidOnBehalf: true,
     paidBackOn: new Date("2024-06-05T12:00:00Z"),
-    createdAt: new Date("2024-06-02T09:00:00Z"),
-    updatedAt: new Date("2024-06-05T12:00:00Z"),
   },
   {
     title: "Dinner Out",
@@ -93,6 +91,40 @@ const mockExpenses: Prisma.ExpenseCreateInput[] = [
     updatedAt: new Date("2024-06-10T16:00:00Z"),
   },
 ];
+
+// DISCLAIMER: AI GENERATED CODE
+// add: ensure unique createdAt (and default updatedAt) before seeding
+function ensureUniqueCreatedAt(expenses: Prisma.ExpenseCreateInput[]) {
+  const used = new Set<number>();
+
+  // First, normalize any existing createdAt to avoid duplicates
+  for (const e of expenses) {
+    if (e.createdAt instanceof Date) {
+      let t = e.createdAt.getTime();
+      while (used.has(t)) t += 1; // bump by 1ms until unique
+      e.createdAt = new Date(t);
+      used.add(t);
+    }
+  }
+
+  // Then assign createdAt for items missing it, making sure they're unique
+  let fillerTime = Date.now();
+  for (const e of expenses) {
+    if (!(e.createdAt instanceof Date)) {
+      // find next unused timestamp
+      while (used.has(fillerTime)) fillerTime += 1;
+      e.createdAt = new Date(fillerTime);
+      used.add(fillerTime);
+      fillerTime += 1;
+    }
+    // ensure updatedAt exists (fallback to createdAt)
+    if (!(e.updatedAt instanceof Date)) {
+      e.updatedAt = new Date((e.createdAt as Date).getTime());
+    }
+  }
+}
+
+ensureUniqueCreatedAt(mockExpenses);
 
 async function main() {
   await prisma.expense.createMany({
