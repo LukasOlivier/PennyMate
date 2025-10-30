@@ -4,9 +4,9 @@ export type Expense = {
   description: string | null;
   amount: number;
   paidOnBehalf: boolean;
-  paidBackOn: Date | null; // Date becomes string after serialization
-  createdAt: Date; // Date becomes string after serialization
-  updatedAt: Date; // Date becomes string after serialization
+  paidBackOn: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export type NewExpense = Omit<Expense, "id" | "createdAt" | "updatedAt">;

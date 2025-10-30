@@ -1,7 +1,8 @@
-import ExpensesForm from "@/components/expenses-form";
+"use server";
+
 import ExpensesTable from "@/components/expenses-table";
 
-export default function ExpensesPage() {
+const ExpensesPage = () => {
   return (
     <main>
       <h1 className="text-3xl mb-2 font-bold">Expenses</h1>
@@ -10,4 +11,5 @@ export default function ExpensesPage() {
       <ExpensesTable />
     </main>
   );
-}
+};
+export default ExpensesPage;
