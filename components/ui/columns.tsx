@@ -1,10 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Expense } from "@/types/expense";
+import { SerializedExpense } from "@/types/expense";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export const columns: ColumnDef<Expense>[] = [
+export const columns: ColumnDef<SerializedExpense>[] = [
   {
     id: "select",
     header: ({ table }) => (

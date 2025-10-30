@@ -15,17 +15,19 @@ import {
 import { useEffect, useState } from "react";
 
 interface DatePickerProps {
-  value?: Date | null;
+  value?: string | null;
   onSetDate: (date: Date) => void;
 }
 
 export function DatePicker({ value, onSetDate }: DatePickerProps) {
-  const [date, setDate] = useState<Date | undefined | null>(value || null);
+  const [date, setDate] = useState<Date | undefined | null>(
+    value ? new Date(value) : null
+  );
 
   // Sync internal date state with external value prop
   useEffect(() => {
     if (value) {
-      setDate(value);
+      setDate(new Date(value));
     }
   }, [value]);
 

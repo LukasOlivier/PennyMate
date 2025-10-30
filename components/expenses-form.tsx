@@ -1,6 +1,6 @@
 "use client";
 
-import { Expense, NewExpense } from "@/types/expense";
+import { SerializedExpense } from "@/types/expense";
 import { ChevronsRight, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
@@ -14,17 +14,22 @@ import { Input } from "./ui/input";
 import { DatePicker } from "./ui/date-picker";
 import { Button } from "./ui/button";
 import { updateExpense } from "@/actions/actions";
+import { Prisma } from "@prisma/client";
 
 interface ExpensesFormProps {
-  expense: Expense | null;
+  expense: SerializedExpense | null;
   onClose: () => void;
 }
 
 export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
-  const [formExpense, setFormExpense] = useState<NewExpense | null>(expense);
+  const [formExpense, setFormExpense] =
+    useState<Prisma.ExpenseCreateInput | null>(expense);
   const [isClosing, setIsClosing] = useState(false);
 
-  function parseFieldValue(field: keyof NewExpense, value: string) {
+  function parseFieldValue(
+    field: keyof Prisma.ExpenseCreateInput,
+    value: string
+  ) {
     if (field === "amount") return Number(value);
     if (field === "paidOnBehalf") return value === "true";
     return value;
@@ -32,7 +37,7 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: keyof NewExpense
+    field: keyof Prisma.ExpenseCreateInput
   ) => {
     const { value } = e.target;
     setFormExpense((prev) =>

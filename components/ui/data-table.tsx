@@ -25,7 +25,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash } from "lucide-react";
-import { Expense, NewExpense } from "@/types/expense";
+import { SerializedExpense } from "@/types/expense";
+import { Prisma } from "@prisma/client";
 import ExpensesForm from "../expenses-form";
 import { addExpense, deleteExpenseIds } from "@/actions/actions";
 
@@ -38,11 +39,12 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [editingExpense, setEditingExpense] =
+    useState<SerializedExpense | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const onDeleteRows = (index: number[]) => {
-    const ids = index.map((i) => (data as Expense[])[i].id);
+    const ids = index.map((i) => (data as SerializedExpense[])[i].id);
     deleteExpenseIds(ids as string[]);
     table.resetRowSelection();
   };
@@ -52,7 +54,7 @@ export function DataTable<TData, TValue>({
     // setIsFormOpen(true);
 
     // TODO: replace with expense from form
-    const mockExpense: NewExpense = {
+    const mockExpense: Prisma.ExpenseCreateInput = {
       title: "New Expense",
       description: "Description",
       amount: 100,
@@ -66,9 +68,9 @@ export function DataTable<TData, TValue>({
   };
 
   const handleEditRow = (index: number) => {
-    const expense = (data as Expense[]).find(
-      (exp) => exp.id === (data as Expense[])[index].id
-    ) as Expense;
+    const expense = (data as SerializedExpense[]).find(
+      (exp) => exp.id === (data as SerializedExpense[])[index].id
+    ) as SerializedExpense;
     if (expense) {
       setEditingExpense(expense);
       setIsFormOpen(true);

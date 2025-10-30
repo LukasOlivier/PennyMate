@@ -1,8 +1,9 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { Expense, NewExpense } from "@/types/expense";
+import { SerializedExpense } from "@/types/expense";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 export async function deleteExpenseIds(expenseIds: string[]) {
   await prisma.expense.deleteMany({
@@ -16,7 +17,7 @@ export async function deleteExpenseIds(expenseIds: string[]) {
   revalidatePath("/expenses");
 }
 
-export async function addExpense(expense: NewExpense) {
+export async function addExpense(expense: Prisma.ExpenseCreateInput) {
   await prisma.expense.create({
     data: {
       ...expense,
@@ -27,7 +28,10 @@ export async function addExpense(expense: NewExpense) {
   revalidatePath("/expenses");
 }
 
-export async function updateExpense(expense: NewExpense, id: string) {
+export async function updateExpense(
+  expense: Prisma.ExpenseCreateInput,
+  id: string
+) {
   if (!id) {
     throw new Error("Expense ID is required");
   }

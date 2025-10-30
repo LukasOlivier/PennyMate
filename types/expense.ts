@@ -1,12 +1,10 @@
-export type Expense = {
+export type SerializedExpense = {
   id: string;
   title: string;
   description: string | null;
   amount: number;
   paidOnBehalf: boolean;
-  paidBackOn: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  paidBackOn: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
-
-export type NewExpense = Omit<Expense, "id" | "createdAt" | "updatedAt">;
