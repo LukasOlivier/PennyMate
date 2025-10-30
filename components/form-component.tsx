@@ -13,17 +13,24 @@ import {
 import { Input } from "./ui/input";
 import { DatePicker } from "./ui/date-picker";
 import { Button } from "./ui/button";
-import { addExpense, updateExpense } from "@/actions/actions";
+import {
+  addExpense,
+  addIncome,
+  updateExpense,
+  updateIncome,
+} from "@/actions/actions";
 import { Prisma } from "@prisma/client";
+import { SerializedIncome } from "@/types/income";
 
-interface ExpensesFormProps {
-  expense: SerializedExpense | null;
+interface FormProps {
+  data: SerializedExpense | SerializedIncome | null;
   onClose: () => void;
 }
 
-export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
-  const [formExpense, setFormExpense] =
-    useState<Prisma.ExpenseCreateInput | null>(expense);
+export default function FormComponent({ data, onClose }: FormProps) {
+  const [formData, setFormData] = useState<
+    Prisma.ExpenseCreateInput | Prisma.IncomeCreateInput | null
+  >(data);
   const [isClosing, setIsClosing] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -43,9 +50,15 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
     return value;
   }
 
+  const isExpense = (
+    obj: Prisma.ExpenseCreateInput | Prisma.IncomeCreateInput | null | undefined
+  ): obj is Prisma.ExpenseCreateInput => {
+    return !!obj && "paidBackOn" in obj;
+  };
+
   useEffect(() => {
-    setFormExpense(expense);
-  }, [expense]);
+    setFormData(data);
+  }, [data]);
 
   // DISCLAIMER: AI GENERATED CODE
   useEffect(() => {
@@ -83,9 +96,9 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
     // clear error for this field as the user types
     setFormErrors((prev) => ({ ...prev, [field]: undefined }));
 
-    setFormExpense((prev) => {
-      // start from existing prev or fall back to expense or empty object
-      const base = (prev ?? expense ?? {}) as Record<string, any>;
+    setFormData((prev) => {
+      // start from existing prev or fall back to data or empty object
+      const base = (prev ?? data ?? {}) as Record<string, any>;
       const updated = {
         ...base,
         [field]: parseFieldValue(field, value),
@@ -116,21 +129,30 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
   };
 
   const validatePaidBackOn = () => {
-    if (formExpense?.paidBackOn && !formExpense.paidOnBehalf) {
+    // Skip validation for non-expense entries (e.g. Income)
+    if (!isExpense(formData)) {
+      // clear any previous error
+      setFormErrors((prev) => ({ ...prev, paidBackOn: undefined }));
+      return true;
+    }
+
+    // Now safe to access paidBackOn on an Expense
+    if (formData.paidBackOn && !formData.paidOnBehalf) {
       const message = "Cannot set Paid Back On if not Paid on behalf";
       setFormErrors((prev) => ({ ...prev, paidBackOn: message }));
       return false;
     }
+    setFormErrors((prev) => ({ ...prev, paidBackOn: undefined }));
     return true;
   };
 
   const validateAll = () => {
-    const titleVal = formExpense?.title ?? "";
+    const titleVal = formData?.title ?? "";
     const amountVal =
-      formExpense && formExpense.amount !== undefined
-        ? String(formExpense.amount)
-        : expense
-        ? String(expense.amount ?? "")
+      formData && formData.amount !== undefined
+        ? String(formData.amount)
+        : data
+        ? String(data.amount ?? "")
         : "";
     const validTitle = validateField("title", String(titleVal));
     const validAmount = validateField("amount", String(amountVal));
@@ -155,11 +177,20 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
     e.preventDefault();
     // validate before submitting
     if (!validateAll()) return;
-    if (expense && formExpense) {
-      await updateExpense(formExpense, expense!!.id);
+    if (isExpense(formData)) {
+      if (data && formData) {
+        await updateExpense(formData, data!!.id);
+      } else {
+        await addExpense(formData as Prisma.ExpenseCreateInput);
+      }
     } else {
-      await addExpense(formExpense as Prisma.ExpenseCreateInput);
+      if (data && formData) {
+        await updateIncome(formData, data!!.id);
+      } else {
+        await addIncome(formData as Prisma.IncomeCreateInput);
+      }
     }
+
     handleClose();
   };
 
@@ -172,15 +203,15 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
     >
       <button
         className="text-xl cursor-pointer mb-10"
-        aria-label="close expenses form"
-        title="Close expenses form"
+        aria-label="close datas form"
+        title="Close datas form"
         onClick={handleClose}
       >
         <ChevronsRight size={32} className="hover:scale-110 transition-all" />
       </button>
       <form className="mt-4 flex-1" onSubmit={handleFormSubmit}>
         <h2 className="text-2xl font-semibold mb-6">
-          {expense ? "Edit Expense" : "New Expense"}
+          {data ? "Edit Expense" : "New Expense"}
         </h2>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col">
@@ -191,7 +222,7 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
               type="text"
               id="title"
               name="title"
-              value={formExpense?.title ?? ""}
+              value={formData?.title ?? ""}
               className={`p-2 rounded bg-surface ${
                 formErrors.title
                   ? "border-red-500 ring-1 ring-red-500"
@@ -213,7 +244,7 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
               type="text"
               id="description"
               name="description"
-              value={formExpense?.description ?? ""}
+              value={formData?.description ?? ""}
               className="p-2 rounded bg-surface border border-white/20"
               onChange={(e) => handleChange(e, "description")}
             />
@@ -233,9 +264,7 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
                 step="0.01"
                 name="amount"
                 value={
-                  formExpense?.amount !== undefined
-                    ? String(formExpense.amount)
-                    : ""
+                  formData?.amount !== undefined ? String(formData.amount) : ""
                 }
                 className={`p-2 pl-8 rounded bg-surface ${
                   formErrors.amount
@@ -250,61 +279,65 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
               <p className="text-red-500 text-sm mt-1">{formErrors.amount}</p>
             )}
           </div>
-
-          <div className="flex flex-col">
-            <label htmlFor="paidOnBehalf" className="mb-2 text-lg">
-              Paid on behalf
-            </label>
-            <Select
-              value={
-                formExpense?.paidOnBehalf !== undefined
-                  ? String(formExpense.paidOnBehalf)
-                  : "false"
-              }
-              onValueChange={(value) =>
-                handleChange(
-                  {
-                    target: { value },
-                  } as React.ChangeEvent<HTMLInputElement>,
-                  "paidOnBehalf"
-                )
-              }
-            >
-              <SelectTrigger className="w-full bg-surface">
-                <SelectValue placeholder="Paid on behalf" />
-              </SelectTrigger>
-              <SelectContent className=" bg-surface">
-                <SelectItem
-                  className="hover:bg-surface-alt bg-surface"
-                  value="true"
+          {/* Paid on behalf & Paid Back On are only for expenses */}
+          {isExpense(formData) && (
+            <>
+              <div className="flex flex-col">
+                <label htmlFor="paidOnBehalf" className="mb-2 text-lg">
+                  Paid on behalf
+                </label>
+                <Select
+                  value={
+                    formData?.paidOnBehalf !== undefined
+                      ? String(formData.paidOnBehalf)
+                      : "false"
+                  }
+                  onValueChange={(value) =>
+                    handleChange(
+                      {
+                        target: { value },
+                      } as React.ChangeEvent<HTMLInputElement>,
+                      "paidOnBehalf"
+                    )
+                  }
                 >
-                  Yes
-                </SelectItem>
-                <SelectItem
-                  className="hover:bg-surface-alt bg-surface"
-                  value="false"
-                >
-                  No
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                  <SelectTrigger className="w-full bg-surface">
+                    <SelectValue placeholder="Paid on behalf" />
+                  </SelectTrigger>
+                  <SelectContent className=" bg-surface">
+                    <SelectItem
+                      className="hover:bg-surface-alt bg-surface"
+                      value="true"
+                    >
+                      Yes
+                    </SelectItem>
+                    <SelectItem
+                      className="hover:bg-surface-alt bg-surface"
+                      value="false"
+                    >
+                      No
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="flex flex-col">
-            <label htmlFor="paidBackOn" className="mb-2 text-lg">
-              Paid Back On
-            </label>
-            <DatePicker
-              value={formExpense?.paidBackOn ?? null}
-              onSetDate={(date) =>
-                setFormExpense((prev) =>
-                  prev
-                    ? { ...prev, paidBackOn: date }
-                    : ({ paidBackOn: date } as Prisma.ExpenseCreateInput)
-                )
-              }
-            />
-          </div>
+              <div className="flex flex-col">
+                <label htmlFor="paidBackOn" className="mb-2 text-lg">
+                  Paid Back On
+                </label>
+                <DatePicker
+                  value={formData?.paidBackOn ?? null}
+                  onSetDate={(date) =>
+                    setFormData((prev) =>
+                      prev
+                        ? { ...prev, paidBackOn: date }
+                        : ({ paidBackOn: date } as Prisma.ExpenseCreateInput)
+                    )
+                  }
+                />
+              </div>
+            </>
+          )}
 
           {formErrors.paidBackOn && (
             <p className="text-red-500 text-sm mt-1">{formErrors.paidBackOn}</p>
@@ -314,7 +347,7 @@ export default function ExpensesForm({ expense, onClose }: ExpensesFormProps) {
           type="submit"
           className="bg-blue-500 hover:bg-blue-600 w-full mt-8"
         >
-          {expense ? "Update Expense" : "Add Expense"}
+          {data ? "Update Expense" : "Add Expense"}
         </Button>
       </form>
     </div>

@@ -3,22 +3,22 @@
 import { columns } from "./ui/columns";
 import { DataTable } from "./ui/data-table";
 import { SerializedExpense } from "@/types/expense";
-import ExpensesForm from "./form-component";
-import { deleteExpenseIds } from "@/actions/actions";
+import { deleteIncomeIds } from "@/actions/actions";
 import { useState } from "react";
+import FormComponent from "./form-component";
 
-interface ExpensesSectionProps {
-  expenses: SerializedExpense[];
+interface IncomeSectionProps {
+  income: SerializedExpense[];
 }
 
-const ExpensesSection = ({ expenses }: ExpensesSectionProps) => {
+const IncomeSection = ({ income }: IncomeSectionProps) => {
   const [editingExpense, setEditingExpense] =
     useState<SerializedExpense | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const onDeleteRows = (index: number[]) => {
-    const ids = index.map((i) => (expenses as SerializedExpense[])[i].id);
-    deleteExpenseIds(ids as string[]);
+    const ids = index.map((i) => (income as SerializedExpense[])[i].id);
+    deleteIncomeIds(ids as string[]);
   };
 
   const onAddRow = () => {
@@ -27,8 +27,8 @@ const ExpensesSection = ({ expenses }: ExpensesSectionProps) => {
   };
 
   const handleEditRow = (index: number) => {
-    const expense = (expenses as SerializedExpense[]).find(
-      (exp) => exp.id === (expenses as SerializedExpense[])[index].id
+    const expense = (income as SerializedExpense[]).find(
+      (exp) => exp.id === (income as SerializedExpense[])[index].id
     ) as SerializedExpense;
     if (expense) {
       setEditingExpense(expense);
@@ -40,13 +40,13 @@ const ExpensesSection = ({ expenses }: ExpensesSectionProps) => {
     <>
       <DataTable
         columns={columns}
-        data={expenses}
+        data={income}
         onAddRow={onAddRow}
         onDeleteRows={onDeleteRows}
         onEditRow={handleEditRow}
       />
       {isFormOpen && (
-        <ExpensesForm
+        <FormComponent
           data={editingExpense}
           onClose={() => setIsFormOpen(false)}
         />
@@ -55,4 +55,4 @@ const ExpensesSection = ({ expenses }: ExpensesSectionProps) => {
   );
 };
 
-export default ExpensesSection;
+export default IncomeSection;

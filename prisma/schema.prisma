@@ -1,3 +1,15 @@
+// Quick commands to push the new Income model to your DB:
+// 1) Dev (creates & applies a migration, updates client):
+//    npx prisma migrate dev --name <name>
+// 2) Fast prototyping (no migrations):
+//    npx prisma db push
+// 3) Regenerate client (if needed):
+//    npx prisma generate
+// 4) Production (apply existing migrations):
+//    npx prisma migrate deploy
+// 5) Check status:
+//    npx prisma migrate status
+
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -22,4 +34,13 @@ model Expense {
   paidBackOn   DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model Income {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  amount      Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

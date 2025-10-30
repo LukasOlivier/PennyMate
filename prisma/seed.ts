@@ -92,43 +92,37 @@ const mockExpenses: Prisma.ExpenseCreateInput[] = [
   },
 ];
 
-// DISCLAIMER: AI GENERATED CODE
-// add: ensure unique createdAt (and default updatedAt) before seeding
-function ensureUniqueCreatedAt(expenses: Prisma.ExpenseCreateInput[]) {
-  const used = new Set<number>();
-
-  // First, normalize any existing createdAt to avoid duplicates
-  for (const e of expenses) {
-    if (e.createdAt instanceof Date) {
-      let t = e.createdAt.getTime();
-      while (used.has(t)) t += 1; // bump by 1ms until unique
-      e.createdAt = new Date(t);
-      used.add(t);
-    }
-  }
-
-  // Then assign createdAt for items missing it, making sure they're unique
-  let fillerTime = Date.now();
-  for (const e of expenses) {
-    if (!(e.createdAt instanceof Date)) {
-      // find next unused timestamp
-      while (used.has(fillerTime)) fillerTime += 1;
-      e.createdAt = new Date(fillerTime);
-      used.add(fillerTime);
-      fillerTime += 1;
-    }
-    // ensure updatedAt exists (fallback to createdAt)
-    if (!(e.updatedAt instanceof Date)) {
-      e.updatedAt = new Date((e.createdAt as Date).getTime());
-    }
-  }
-}
-
-ensureUniqueCreatedAt(mockExpenses);
+// Add: mock incomes to seed
+const mockIncomes: Prisma.IncomeCreateInput[] = [
+  {
+    title: "Salary",
+    description: "Monthly salary",
+    amount: 3000,
+    createdAt: new Date("2024-06-01T09:00:00Z"),
+    updatedAt: new Date("2024-06-01T09:00:00Z"),
+  },
+  {
+    title: "Side Project",
+    description: "Income from freelance",
+    amount: 450,
+    createdAt: new Date("2024-06-03T15:00:00Z"),
+  },
+  {
+    title: "Gift",
+    description: "Birthday gift",
+    amount: 100,
+    createdAt: new Date("2024-06-05T12:00:00Z"),
+  },
+];
 
 async function main() {
   await prisma.expense.createMany({
     data: mockExpenses,
+  });
+
+  // add: seed incomes
+  await prisma.income.createMany({
+    data: mockIncomes,
   });
 }
 main()
