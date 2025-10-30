@@ -21,7 +21,7 @@ const ExpensesPage = async () => {
       <h1 className="text-3xl mb-2 font-bold">Expenses</h1>
       <hr className="mb-4" />
 
-      <ExpensesSection expenses={serializedExpenses} />
+      <ExpensesSection initialExpenses={serializedExpenses} />
     </main>
   );
 };

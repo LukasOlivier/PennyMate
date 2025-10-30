@@ -83,3 +83,44 @@ export async function deleteIncomeIds(incomeIds: string[]) {
 
   revalidatePath("/incomes");
 }
+
+export type ExpenseFilters = {
+  startDate: Date | null;
+  endDate: Date | null;
+  isPaidOnBehalf: boolean | null;
+};
+
+export async function getExpenses(
+  filters: ExpenseFilters = {
+    startDate: null,
+    endDate: null,
+    isPaidOnBehalf: null,
+  }
+): Promise<SerializedExpense[]> {
+  const { startDate, endDate, isPaidOnBehalf } = filters;
+
+  const where: Prisma.ExpenseWhereInput = {};
+
+  if (startDate || endDate) {
+    where.createdAt = {};
+    if (startDate) (where.createdAt as any).gte = startDate;
+    if (endDate) (where.createdAt as any).lte = endDate;
+  }
+
+  if (isPaidOnBehalf !== null && isPaidOnBehalf !== undefined) {
+    where.paidOnBehalf = isPaidOnBehalf;
+  }
+
+  const expenses = await prisma.expense.findMany({
+    where,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return expenses.map((expense) => ({
+    ...expense,
+    createdAt: expense.createdAt.toISOString(),
+    updatedAt: expense.updatedAt?.toISOString(),
+  })) as SerializedExpense[];
+}

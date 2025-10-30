@@ -26,12 +26,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className=" bg-surface">
       <head>
         <meta name="apple-mobile-web-app-title" content="PennyMate" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-surface text-primary min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-primary min-h-1/2 h-full flex flex-col`}
       >
         <DeskopNavbar />
         <main className="w-11/12 md:w-8/12 mx-auto grow mt-10 md:mt-20">
