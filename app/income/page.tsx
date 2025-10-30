@@ -18,14 +18,7 @@ const IncomesPage = async () => {
     <main>
       <h1 className="text-3xl mb-2 font-bold">Income</h1>
       <hr className="mb-4" />
-
-      <div>
-        Your total income is: $
-        {serializedIncomes
-          .reduce((total, income) => total + income.amount, 0)
-          .toFixed(2)}
-      </div>
-      <IncomeSection income={serializedIncomes} />
+      <IncomeSection initialIncome={serializedIncomes} />
     </main>
   );
 };

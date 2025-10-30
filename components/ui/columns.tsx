@@ -3,8 +3,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { SerializedExpense } from "@/types/expense";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SerializedIncome } from "@/types/income";
 
-export const columns: ColumnDef<SerializedExpense>[] = [
+const baseColumns: ColumnDef<SerializedExpense | SerializedIncome>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -24,6 +25,16 @@ export const columns: ColumnDef<SerializedExpense>[] = [
         aria-label="Select row"
       />
     ),
+  },
+  {
+    accessorKey: "createdAt",
+    header: () => <div>Date</div>,
+    cell: ({ row }) => {
+      const date = row.getValue("createdAt") as Date | undefined;
+      return (
+        <span>{date ? new Date(date).toLocaleDateString("nl-BE") : "N/A"}</span>
+      );
+    },
   },
   {
     accessorKey: "title",
@@ -46,6 +57,9 @@ export const columns: ColumnDef<SerializedExpense>[] = [
       return <div className="font-medium">{formatted}</div>;
     },
   },
+];
+
+const expenseColumns: ColumnDef<SerializedExpense | SerializedIncome>[] = [
   {
     accessorKey: "paidOnBehalf",
     header: "Paid On Behalf",
@@ -69,3 +83,12 @@ export const columns: ColumnDef<SerializedExpense>[] = [
     },
   },
 ];
+
+export function getColumns(
+  type: "expense" | "income"
+): ColumnDef<SerializedExpense | SerializedIncome>[] {
+  if (type === "expense") {
+    return [...baseColumns, ...expenseColumns];
+  }
+  return baseColumns;
+}

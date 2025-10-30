@@ -5,6 +5,7 @@ import { SerializedExpense } from "@/types/expense";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { SerializedIncome } from "@/types/income";
+import { ExpenseFilters, IncomeFilters } from "@/types/filters";
 
 export async function deleteExpenseIds(expenseIds: string[]) {
   await prisma.expense.deleteMany({
@@ -84,12 +85,6 @@ export async function deleteIncomeIds(incomeIds: string[]) {
   revalidatePath("/incomes");
 }
 
-export type ExpenseFilters = {
-  startDate: Date | null;
-  endDate: Date | null;
-  isPaidOnBehalf: boolean | null;
-};
-
 export async function getExpenses(
   filters: ExpenseFilters = {
     startDate: null,
@@ -122,5 +117,35 @@ export async function getExpenses(
     ...expense,
     createdAt: expense.createdAt.toISOString(),
     updatedAt: expense.updatedAt?.toISOString(),
+  })) as SerializedExpense[];
+}
+
+export async function getIncome(
+  filters: IncomeFilters = {
+    startDate: null,
+    endDate: null,
+  }
+): Promise<SerializedIncome[]> {
+  const { startDate, endDate } = filters;
+  console.log("filters", filters);
+  const where: Prisma.IncomeWhereInput = {};
+
+  if (startDate || endDate) {
+    where.createdAt = {};
+    if (startDate) (where.createdAt as any).gte = startDate;
+    if (endDate) (where.createdAt as any).lte = endDate;
+  }
+
+  const income = await prisma.income.findMany({
+    where,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return income.map((income) => ({
+    ...income,
+    createdAt: income.createdAt.toISOString(),
+    updatedAt: income.updatedAt?.toISOString(),
   })) as SerializedExpense[];
 }
