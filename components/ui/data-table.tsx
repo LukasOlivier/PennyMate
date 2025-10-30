@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,6 +12,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "@/components/ui/data-table-view-options";
@@ -25,54 +25,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Pencil, Plus, Trash } from "lucide-react";
-import { SerializedExpense } from "@/types/expense";
-import { Prisma } from "@prisma/client";
-import ExpensesForm from "../expenses-form";
-import { addExpense, deleteExpenseIds } from "@/actions/actions";
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  onAddRow: () => void;
+  onDeleteRows: (rowIndices: number[]) => void;
+  onEditRow: (rowIndex: number) => void;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  onAddRow,
+  onDeleteRows,
+  onEditRow,
 }: DataTableProps<TData, TValue>) {
-  const [editingExpense, setEditingExpense] =
-    useState<SerializedExpense | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-
-  const onDeleteRows = (index: number[]) => {
-    const ids = index.map((i) => (data as SerializedExpense[])[i].id);
-    deleteExpenseIds(ids as string[]);
-    table.resetRowSelection();
-  };
-
-  const onAddRow = () => {
-    setEditingExpense(null);
-    setIsFormOpen(true);
-    table.resetRowSelection();
-  };
-
-  const handleEditRow = (index: number) => {
-    const expense = (data as SerializedExpense[]).find(
-      (exp) => exp.id === (data as SerializedExpense[])[index].id
-    ) as SerializedExpense;
-    if (expense) {
-      setEditingExpense(expense);
-      setIsFormOpen(true);
-    }
-    table.resetRowSelection();
-  };
-
   // TABLE STATE
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [rowSelection, setRowSelection] = useState({});
   const table = useReactTable({
     data,
     columns,
@@ -118,14 +90,15 @@ export function DataTable<TData, TValue>({
               className="md:max-w-sm grow"
             />
           </div>
-          <div className="flex gap-2  ">
+          <div className="flex gap-2">
             <Button
               className="bg-blue-500 cursor-pointer hover:bg-blue-600 "
               variant="destructive"
               disabled={Object.keys(rowSelection).length !== 1}
-              onClick={() =>
-                handleEditRow(Number(Object.keys(rowSelection)[0]))
-              }
+              onClick={() => {
+                onEditRow(Number(Object.keys(rowSelection)[0]));
+                table.resetRowSelection();
+              }}
             >
               <Pencil></Pencil>
             </Button>
@@ -135,7 +108,9 @@ export function DataTable<TData, TValue>({
               variant="destructive"
               disabled={Object.keys(rowSelection).length === 0}
               onClick={() => {
-                onDeleteRows(Object.keys(rowSelection).map(Number));
+                onDeleteRows(
+                  Object.keys(rowSelection).map((key) => Number(key))
+                );
                 table.resetRowSelection();
               }}
             >
@@ -229,12 +204,6 @@ export function DataTable<TData, TValue>({
           </div>
         </div>
       </div>
-      {isFormOpen && (
-        <ExpensesForm
-          expense={editingExpense}
-          onClose={() => setIsFormOpen(false)}
-        />
-      )}
     </>
   );
 }
