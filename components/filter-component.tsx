@@ -66,12 +66,12 @@ const FilterComponent = ({
   };
 
   return (
-    <div className="flex gap-4 mb-4">
-      <ul className="flex gap-2">
+    <div className="flex gap-4 mb-4 flex-col md:flex-row">
+      <ul className="flex gap-2 grow md:max-w-md">
         {/* Time Filter */}
-        <li>
+        <li className="grow">
           <Button
-            className={`hover:text-black ${
+            className={`hover:text-black w-full ${
               dateFilter === "all" || dateFilter === null
                 ? "bg-zinc-100 text-black"
                 : "bg-surface"
@@ -84,9 +84,9 @@ const FilterComponent = ({
             All Time
           </Button>
         </li>
-        <li>
+        <li className="grow">
           <Button
-            className={`hover:text-black ${
+            className={`hover:text-black w-full ${
               dateFilter === "month" ? "bg-zinc-100 text-black" : "bg-surface"
             }`}
             onClick={() => {
@@ -97,9 +97,9 @@ const FilterComponent = ({
             This Month
           </Button>
         </li>
-        <li>
+        <li className="grow">
           <Button
-            className={`hover:text-black ${
+            className={`hover:text-black w-full ${
               dateFilter === "year" ? "bg-zinc-100 text-black" : "bg-surface"
             }`}
             onClick={() => {
@@ -113,7 +113,7 @@ const FilterComponent = ({
       </ul>
       {isExpenseFilter(currentFilters) && (
         <>
-          <div className="border  border-surface-alt"></div>
+          <div className="hidden md:block border border-surface-alt"></div>
           <Button
             className={`hover:text-black ${
               currentFilters.isPaidOnBehalf === null

@@ -17,12 +17,12 @@ const ExpensesPage = async () => {
   })) as SerializedExpense[];
 
   return (
-    <main>
+    <section>
       <h1 className="text-3xl mb-2 font-bold">Expenses</h1>
       <hr className="mb-4" />
 
       <ExpensesSection initialExpenses={serializedExpenses} />
-    </main>
+    </section>
   );
 };
 export default ExpensesPage;

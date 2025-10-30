@@ -12,7 +12,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "@/components/ui/data-table-view-options";
@@ -40,6 +40,31 @@ export function DataTable<TData, TValue>({
   onDeleteRows,
   onEditRow,
 }: DataTableProps<TData, TValue>) {
+  const [pageSize, setPageSize] = useState(10); // Always start with default for SSR
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set mounted state and calculate page size after hydration
+  useEffect(() => {
+    setIsMounted(true);
+
+    const getPageSize = () => {
+      const width = window.innerWidth;
+      if (width < 640) return 8; // mobile
+      if (width < 1024) return 8; // tablet
+      if (width < 1536) return 10; // desktop
+      return 10; // large desktop
+    };
+
+    setPageSize(getPageSize());
+
+    const handleResize = () => {
+      setPageSize(getPageSize());
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   // TABLE STATE
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -65,6 +90,11 @@ export function DataTable<TData, TValue>({
     onGlobalFilterChange: setGlobalFilter,
     getPaginationRowModel: getPaginationRowModel(),
     onRowSelectionChange: setRowSelection,
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
     state: {
       sorting,
       columnFilters,
@@ -72,6 +102,13 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   });
+
+  // Update table page size after mount
+  useEffect(() => {
+    if (isMounted) {
+      table.setPageSize(pageSize);
+    }
+  }, [pageSize, table, isMounted]);
 
   return (
     <>

@@ -15,11 +15,11 @@ const IncomesPage = async () => {
   })) as SerializedIncome[];
 
   return (
-    <main>
+    <section>
       <h1 className="text-3xl mb-2 font-bold">Income</h1>
       <hr className="mb-4" />
       <IncomeSection initialIncome={serializedIncomes} />
-    </main>
+    </section>
   );
 };
 export default IncomesPage;
