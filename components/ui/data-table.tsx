@@ -40,26 +40,53 @@ export function DataTable<TData, TValue>({
   onDeleteRows,
   onEditRow,
 }: DataTableProps<TData, TValue>) {
-  const [pageSize, setPageSize] = useState(10); // Always start with default for SSR
+  const [pageSize, setPageSize] = useState(10);
   const [isMounted, setIsMounted] = useState(false);
 
-  // Set mounted state and calculate page size after hydration
+  // DISCLAIMER: AI GENERATED CODE
   useEffect(() => {
     setIsMounted(true);
 
-    const getPageSize = () => {
-      const width = window.innerWidth;
-      if (width < 640) return 8; // mobile
-      if (width < 1024) return 8; // tablet
-      if (width < 1536) return 10; // desktop
-      return 10; // large desktop
-    };
+    const calculatePageSize = () => {
+      // Get viewport height
+      const viewportHeight = window.innerHeight;
+      // Get table container element
+      const tableContainer = document.querySelector(
+        ".overflow-hidden.rounded-md.border"
+      );
+      if (!tableContainer) return 10;
 
-    setPageSize(getPageSize());
+      // Get the height of a single row (including padding)
+      const sampleRow = tableContainer.querySelector("tr");
+      if (!sampleRow) return 10;
+      const rowHeight = sampleRow.offsetHeight;
+
+      // Get heights of other UI elements
+      const headerHeight =
+        tableContainer.querySelector("thead")?.offsetHeight || 0;
+      const searchBarHeight = 450; // Approximate height of search bar area
+      const paginationHeight = 64; // Approximate height of pagination controls
+
+      // Calculate available space for table body
+      const availableHeight =
+        viewportHeight - headerHeight - searchBarHeight - paginationHeight;
+
+      // Calculate how many rows can fit
+      const maxRows = Math.floor(availableHeight / rowHeight);
+
+      // Ensure we have at least 5 rows and at most 15 rows
+      return Math.max(5, Math.min(15, maxRows));
+    };
 
     const handleResize = () => {
-      setPageSize(getPageSize());
+      // Use requestAnimationFrame to avoid excessive calculations during resize
+      requestAnimationFrame(() => {
+        setPageSize(calculatePageSize());
+      });
     };
+
+    // Initial calculation
+    setPageSize(calculatePageSize());
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
