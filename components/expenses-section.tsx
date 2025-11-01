@@ -19,10 +19,19 @@ const ExpensesSection = ({ initialExpenses }: ExpensesSectionProps) => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [expenses, setExpenses] =
     useState<SerializedExpense[]>(initialExpenses);
+  const [currentFilters, setCurrentFilters] = useState<
+    ExpenseFilters | IncomeFilters
+  >({
+    startDate: null,
+    endDate: null,
+    isPaidOnBehalf: null,
+  });
 
-  const onDeleteRows = (index: number[]) => {
+  const onDeleteRows = async (index: number[]) => {
     const ids = index.map((i) => (expenses as SerializedExpense[])[i].id);
-    deleteExpenseIds(ids as string[]);
+    await deleteExpenseIds(ids as string[]);
+    const data = await getExpenses(currentFilters as ExpenseFilters);
+    setExpenses(data);
   };
 
   const onAddRow = () => {
@@ -40,13 +49,20 @@ const ExpensesSection = ({ initialExpenses }: ExpensesSectionProps) => {
     }
   };
 
-  async function fetchFilteredExpenses(
+  const handleFormClose = async () => {
+    setIsFormOpen(false);
+    const data = await getExpenses(currentFilters as ExpenseFilters);
+    setExpenses(data);
+  };
+
+  const fetchFilteredExpenses = async (
     filters: ExpenseFilters | IncomeFilters
-  ) {
+  ) => {
+    setCurrentFilters(filters);
     const expenseFilters = filters as ExpenseFilters;
     const data = await getExpenses(expenseFilters);
     setExpenses(data);
-  }
+  };
 
   const defaultFilters: ExpenseFilters = {
     startDate: null,
@@ -68,10 +84,7 @@ const ExpensesSection = ({ initialExpenses }: ExpensesSectionProps) => {
         onEditRow={handleEditRow}
       />
       {isFormOpen && (
-        <ExpensesForm
-          data={editingExpense}
-          onClose={() => setIsFormOpen(false)}
-        />
+        <ExpensesForm data={editingExpense} onClose={handleFormClose} />
       )}
     </>
   );

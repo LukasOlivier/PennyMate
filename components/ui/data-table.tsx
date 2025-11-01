@@ -157,7 +157,6 @@ export function DataTable<TData, TValue>({
           <div className="flex gap-2">
             <Button
               className="bg-blue-500 cursor-pointer hover:bg-blue-600 "
-              variant="destructive"
               disabled={Object.keys(rowSelection).length !== 1}
               onClick={() => {
                 onEditRow(Number(Object.keys(rowSelection)[0]));
@@ -169,7 +168,6 @@ export function DataTable<TData, TValue>({
 
             <Button
               className="bg-red-500 cursor-pointer hover:bg-red-600 "
-              variant="destructive"
               disabled={Object.keys(rowSelection).length === 0}
               onClick={() => {
                 onDeleteRows(
@@ -183,10 +181,10 @@ export function DataTable<TData, TValue>({
 
             <Button
               className={"bg-blue-500 cursor-pointer hover:bg-blue-600 grow"}
-              variant="destructive"
               disabled={Object.keys(rowSelection).length > 0}
               onClick={() => onAddRow()}
             >
+              New
               <Plus></Plus>
             </Button>
           </div>

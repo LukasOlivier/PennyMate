@@ -19,13 +19,22 @@ const IncomeSection = ({ initialIncome = [] }: IncomeSectionProps) => {
   );
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [income, setIncome] = useState<SerializedIncome[]>(initialIncome);
+  const [currentFilters, setCurrentFilters] = useState<
+    ExpenseFilters | IncomeFilters
+  >({
+    startDate: null,
+    endDate: null,
+    isPaidOnBehalf: null,
+  });
 
-  const onDeleteRows = (index: number[]) => {
+  const onDeleteRows = async (index: number[]) => {
     const ids = index
       .map((i) => income[i]?.id)
       .filter((id): id is string => !!id);
     if (ids.length > 0) {
       deleteIncomeIds(ids);
+      const data = await getIncome(currentFilters as IncomeFilters);
+      setIncome(data);
     }
   };
 
@@ -42,12 +51,17 @@ const IncomeSection = ({ initialIncome = [] }: IncomeSectionProps) => {
     }
   };
 
-  async function fetchFilteredExpenses(
-    filters: ExpenseFilters | IncomeFilters
-  ) {
-    const incomeFilters = filters as IncomeFilters;
-    const data = await getIncome(incomeFilters);
-    setIncome(data ?? []);
+  const handleFormClose = async () => {
+    setIsFormOpen(false);
+    const data = await getIncome(currentFilters as IncomeFilters);
+    setIncome(data);
+  };
+
+  async function fetchFilteredIncome(filters: ExpenseFilters | IncomeFilters) {
+    setCurrentFilters(filters);
+    const expenseFilters = filters as ExpenseFilters;
+    const data = await getIncome(expenseFilters);
+    setIncome(data);
   }
 
   const defaultFilters: IncomeFilters = {
@@ -59,7 +73,7 @@ const IncomeSection = ({ initialIncome = [] }: IncomeSectionProps) => {
     <>
       <FilterComponent
         defaultFilters={defaultFilters}
-        onFilterChanged={fetchFilteredExpenses}
+        onFilterChanged={fetchFilteredIncome}
       ></FilterComponent>
       <DataTable
         columns={getColumns("income")}
@@ -69,10 +83,7 @@ const IncomeSection = ({ initialIncome = [] }: IncomeSectionProps) => {
         onEditRow={handleEditRow}
       />
       {isFormOpen && (
-        <FormComponent
-          data={editingExpense}
-          onClose={() => setIsFormOpen(false)}
-        />
+        <FormComponent data={editingExpense} onClose={handleFormClose} />
       )}
     </>
   );

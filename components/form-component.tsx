@@ -34,7 +34,6 @@ export default function FormComponent({ data, onClose }: FormProps) {
   const [isClosing, setIsClosing] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // Add validation state
   const [formErrors, setFormErrors] = useState<{
     title?: string;
     amount?: string;
@@ -278,6 +277,21 @@ export default function FormComponent({ data, onClose }: FormProps) {
             {formErrors.amount && (
               <p className="text-red-500 text-sm mt-1">{formErrors.amount}</p>
             )}
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="paidBackOn" className="mb-2 text-lg">
+              Date
+            </label>
+            <DatePicker
+              value={formData?.createdAt ?? new Date()}
+              onSetDate={(date) =>
+                setFormData((prev) =>
+                  prev
+                    ? { ...prev, createdAt: date }
+                    : ({ createdAt: date } as Prisma.ExpenseCreateInput)
+                )
+              }
+            />
           </div>
           {/* Paid on behalf & Paid Back On are only for expenses */}
           {isExpense(formData) && (

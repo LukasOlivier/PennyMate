@@ -54,7 +54,7 @@ export async function addIncome(income: Prisma.IncomeCreateInput) {
     },
   });
 
-  revalidatePath("/incomes");
+  revalidatePath("/income");
 }
 
 export async function updateIncome(
@@ -70,7 +70,7 @@ export async function updateIncome(
     data: income,
   });
 
-  revalidatePath("/incomes");
+  revalidatePath("/income");
 }
 
 export async function deleteIncomeIds(incomeIds: string[]) {
@@ -82,7 +82,7 @@ export async function deleteIncomeIds(incomeIds: string[]) {
     },
   });
 
-  revalidatePath("/incomes");
+  revalidatePath("/income");
 }
 
 export async function getExpenses(
